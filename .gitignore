@@ -37,3 +37,9 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+
+# exclude everything in PDF folder
+PDF/*
+
+# exception to the rule
+!PDF/.gitkeep 
