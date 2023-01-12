@@ -27,7 +27,7 @@ tidy <- from_saves('PADs')
 # Data set-up for the classification model
 # Connect to the training database
 conn <- dbConnect(RSQLite::SQLite(),
-                  here("Settings", "training_data.db"))
+                  here("Settings", "Model", "training_data.db"))
 
 # Import the data used for training the model
 data_training <- dbGetQuery(conn, glue("SELECT * FROM SDGs"))
@@ -74,11 +74,15 @@ rm(working_dataset)
 ncols_dtm <- dim(x_train)[2]
 
 # Train the random forest model using the training data set
-t0 <- Sys.time()
-classifier <- randomForest(x = x_train[, -ncols_dtm],
-                           y = x_train$Target,
-                           ntree = 51)
-rm(x_train)
+if ("model.Rdata" %in% list.files(here("Settings", "Model"))) {
+    load(here("Settings", "Model", "model.Rdata"))
+} else {
+    t0 <- Sys.time()
+    classifier <- randomForest(x = x_train[, -ncols_dtm],
+                               y = x_train$Target,
+                               ntree = 51)
+    rm(x_train)
+}
 
 # Classify the input data -- Map the projects to the SDGs
 y_pred <- predict(classifier, newdata = x_test[, -ncols_dtm])
@@ -95,6 +99,10 @@ results <- data_complete %>%
 rm(data_complete)
 
 results$Target <- classified
+
+
+
+
 
 results <- identify_SDGs(results)
 

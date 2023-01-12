@@ -47,6 +47,7 @@ initialise_app <- function(font = 'Roboto Condensed', dpi = 96) {
 
 
 outputs_folder <- function(analysis_mode, kind) {
+    analysis_mode <- as.character(analysis_mode)[[1]]
     folders <- jsonlite::fromJSON(here("Settings", "output_folders.json"))
     return(folders[[analysis_mode]][[kind]])
 }

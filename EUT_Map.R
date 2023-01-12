@@ -27,7 +27,7 @@ tidy <- from_saves('PADs')
 # Data set-up for the classification model
 # Connect to the training database
 conn <- dbConnect(RSQLite::SQLite(),
-                  here("Settings", "training_data.db"))
+                  here("Settings", "Model", "training_data.db"))
 
 # Import the data used for training the model
 data_training <- dbGetQuery(conn, glue("SELECT * FROM EUT"))

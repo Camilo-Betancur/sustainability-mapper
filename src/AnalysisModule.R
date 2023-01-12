@@ -60,11 +60,6 @@ run_mapper <- function() {
 
     option <- as.character(invisible(readline()))
 
-
-    # ====== Setting up text fonts =============================================
-    initialise_fonts()
-
-
     # ===== Text pre-processing ================================================
     if (option == '1') {
         cli_text("")
@@ -256,9 +251,7 @@ run_mapper <- function() {
         export_summary(occurrence_SDG, 'occurrence_SDG_total', analysis_mode)
         export_summary(matches_SDG_proj, 'matches_SDG_proj', analysis_mode)
         export_summary(matches_tgt_proj, 'matches_tgt_proj', analysis_mode)
-        export_summary(occurrence_SDG_proj,
-                       'occurrence_SDG_proj',
-                       analysis_mode)
+        export_summary(occurrence_SDG_proj, 'occurrence_SDG_proj', analysis_mode)
         export_summary(main_SDGs, 'main_SDGs_total', analysis_mode)
         export_summary(main_SDGs_proj, 'main_SDGs_proj', analysis_mode)
         export_summary(SDGs_proj, 'SDGs_by_project', analysis_mode)
