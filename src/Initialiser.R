@@ -23,6 +23,7 @@ initialise_app <- function(font = 'Roboto Condensed', dpi = 96) {
     source(here('src', 'Mapper.R'))
     source(here('src', 'ViewResults.R'))
     source(here('src', 'AnalysisModule.R'))
+    source(here('src', 'Model.R'))
 
     font_add(font,
              here('Settings',

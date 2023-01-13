@@ -28,15 +28,17 @@ run_mapper <- function() {
     cli_text("")
 
     cli_text(glue(
-        "Welcome to the ", col_red("Sustainability Mapper Tool"), ", ",
-        "a tool developed by the Stockholm Environment Institute for ",
-        " mapping the World Bank's portfolio to the ",
-        col_red("Sustainable Development Goals "),
-        "and the ", col_red("European Taxonomy for Sustainability"), "."
+        "Welcome to the {col_red('Sustainability Mapper Tool')}, a tool ",
+        "developed by the {col_red('Stockholm Environment Institute')} for ",
+        "mapping the World Bank's portfolio to the {col_red('Sustainable')} ",
+        "{col_red('Development Goals (SDGs)')} and the {col_red('European')} ",
+        "{col_red('Taxonomy for Sustainable Activities')}. This application ",
+        "will allow you to identify which targets and goals from any of the ",
+        "agendas correspond to a set of PDF documents."
     ))
 
     cli_text("")
-    cli_text("Please, press {col_green('ENTER')} to continue")
+    cli_text("Please, press {col_green('ENTER')} to continue.")
     invisible(readline())
 
     cli_h2("Folder verification")

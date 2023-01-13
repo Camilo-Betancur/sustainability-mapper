@@ -4,9 +4,19 @@ load_training_data <- function(analysis_mode) {
     # Import the data used for training the model
     # Data set-up for the classification model
     # Connect to the training database
-    conn <- dbConnect(RSQLite::SQLite(),
-                      here("Settings", "Model", "training_data.db"))
 
+    if (file.exists(here("Settings", "Model", "training_data.db"))) {
+        conn <- dbConnect(RSQLite::SQLite(),
+                          here("Settings", "Model", "training_data.db"))
+    } else {
+        cli_alert_warning(
+            glue(
+                "No training database found. Please, make sure that there ",
+                "is a database file named {col_red('training_data.db')} at ",
+                "{col_red(here('Settings', 'Model'))}"
+            )
+        )
+    }
     # Import the data used for training the model
     data_training <- dbGetQuery(conn, glue("SELECT * FROM {analysis_mode}"))
 
@@ -16,9 +26,10 @@ load_training_data <- function(analysis_mode) {
     dtm <- corpus_dtm(data_training)
 
     # Create the working data set
-    working_dataset <- codify(dtm, data_training)
+    x_train <- codify(dtm, data_training)
+    x_train <- x_train %>% slice(-1)
 
-    return(working_dataset)
+    return(x_train)
 }
 
 train_model <- function(analysis_mode) {
@@ -38,14 +49,14 @@ train_model <- function(analysis_mode) {
                                    y = x_train$Target,
                                    ntree = 51)
 
-        save(classifier, file = here("Settings",
+        saveRDS(classifier, file = here("Settings",
                                      "Model",
-                                     "model_SDGs.Rdata"))
+                                     "model_SDGs.Rds"))
 
         cli_alert_success(glue(
             "Model successfully exported to the path ",
             style_underline(style_italic(col_br_red(here(
-                "Settings", "Model", "model_SDGs.Rdata"
+                "Settings", "Model", "model_SDGs.Rds"
             ))))
         ))
     } else if (analysis_mode == 'EUT') {
@@ -55,7 +66,7 @@ train_model <- function(analysis_mode) {
 
         save(classifier, file = here("Settings",
                                      "Model",
-                                     "model_EUT.Rdata"))
+                                     "model_EUT.Rds"))
 
         cli_alert_success(glue(
             "Model successfully exported to the path ",
@@ -64,34 +75,74 @@ train_model <- function(analysis_mode) {
             ))))
         ))
     } else {cli_alert_warning("Analysis mode should be 'SDGs' or 'EUT'.")}
+
+    write.csv(colnames(x_train),
+              here(
+                  "Settings",
+                  "Model",
+                  glue("cols_training_{analysis_mode}.csv")
+              ),
+              row.names = FALSE,
+              fileEncoding = 'UTF-8')
 }
 
 
 load_model <- function(analysis_mode) {
     if (file.exists(
-        here("Settings", "Model", glue("model_{analysis_mode}.Rdata"))
+        here("Settings", "Model", glue("model_{analysis_mode}.Rds"))
     )) {
-        load(here("Settings", "Model", glue("model_{analysis_mode}.Rdata")))
+        loadRDS(here("Settings", "Model", glue("model_{analysis_mode}.Rds")))
     } else {
+        cli_alert_warning(
+            glue("There is no trained model in the folder. ",
+                 "Press ", col_green("ENTER"), " to train it.")
+        )
+
+        invisible(readline())
+
         train_model(analysis_mode)
     }
 }
 
+analysis_mode = 'SDGs'
 
 map_texts <- function(tidy_texts, analysis_mode) {
     # Create a Document Term Matrix (DTM)
-    dtm <- corpus_dtm(tidy_texts)
+    dtm <- corpus_dtm(tidy)
 
     # Create the working data set
-    x_test <- codify(dtm, tidy_texts)
-    x_test <- x_test %>% slice(-1)
-    x_test$Target <- factor(x_test$Target)
+    x_test <- codify(dtm, tidy)
+    # x_test <- x_test %>% slice(-1)
 
-    # Load the classification model
-    load()
+    col <- read.csv(here(
+        "Settings", "Model", glue("cols_training_{analysis_mode}.csv")))[[1]]
+
+    x_test <- x_test[, intersect(colnames(x_test), col)]
+
+    missing <- setdiff(col, colnames(x_test))
+
+    mat_zero <- setNames(as.data.frame(matrix(0,
+                                              ncol = length(missing),
+                                              nrow = nrow(x_test))),
+                         missing)
+
+    x_test <- cbind(mat_zero, x_test)
+
+    x_test <- x_test[col]
+
+    x_train <- load_training_data(analysis_mode)
+
+    working_dataset <- rbind(x_test, x_train)
+
+    working_dataset$Target <- factor(working_dataset$Target)
+
+    test_row <- nrow(x_test)
+    train_row <- nrow(x_train)
+
+    x_test <- working_dataset[1:test_row, ]
 
     # Predict the goals that each text maps to
-    y_pred <- predict(classifier, newdata = x_test[, -ncols_dtm])
+    y_pred <- predict(classifier, newdata = x_test[, -ncol(x_test)])
 
     # Save the results in a character vector
     classified <- character()
@@ -101,9 +152,21 @@ map_texts <- function(tidy_texts, analysis_mode) {
     results <- tidy_texts
 
     results$Target <- classified
+
+    return(results)
 }
 
+# =====
 
-load_model('EUT')
+# classifier <- readRDS("Settings/Model/model_SDGs.Rds")
+#
+# train_model('SDGs')
+#
+# load_model('SDGs')
+#
+# a <- map_texts(tidy, 'SDGs')
 
-train_model('EUT')
+# =====
+
+
+
