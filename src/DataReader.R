@@ -184,23 +184,42 @@ tidify <- function(df,
     # Updates the progress bar to "Done" status
     cli_progress_done(result = "done")
 
+    tibblist <- tibblist %>%
+        mutate(Target = 'No map')
+
+    # Ends the function's general timer
+    t_f_general <- Sys.time()
+
+    # Prints that the process is done and the time it took to complete it
+    cli_alert_success(
+        glue(
+            "\n\nDone! The process took ",
+            "{round(difftime(t_f_general, t_0_general, units = 'mins'), 2)} ",
+            "minutes"
+        )
+    )
+
+    cli_text("")
+
+    cli_alert_success(glue(
+        "Press {col_green('Y')} or {col_green('y')} and ",
+        "{col_green('ENTER')} to {col_green('SAVE')} the tidy texts. ",
+        "Otherwise, press any key and {col_green('ENTER')}."
+    ))
+
+    export_json <- invisible(readline())
+
     # Saves the results to a JSON file
-    if (export_json == TRUE) {
+    if ((export_json == 'Y') | (export_json == 'y')) {
+
+        cli_text("")
+
+        cli_text("Please, write the name you want for the saved data.")
+
+        version_name <- invisible(readline())
 
         write(jsonlite::toJSON(tibblist),
               file = here(glue("Saves/{version_name}.json")))
-
-        # Ends the function's general timer
-        t_f_general <- Sys.time()
-
-        # Prints that the process is done and the time it took to complete it
-        cli_alert_success(
-            glue(
-                "\n\nDone! The process took ",
-                "{round(difftime(t_f_general, t_0_general, units = 'mins'), 2)} ",
-                "minutes"
-            )
-        )
 
         cli_alert_success(glue(
             "Data successfully exported to the path ",
@@ -218,9 +237,6 @@ tidify <- function(df,
         )
 
     }
-
-    tibblist <- tibblist %>%
-        mutate(Target = 'A')
 
     return(tibblist)
 }

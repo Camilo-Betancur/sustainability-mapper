@@ -106,12 +106,12 @@ load_model <- function(analysis_mode) {
 
 analysis_mode = 'SDGs'
 
-map_texts <- function(tidy_texts, analysis_mode) {
+map_texts <- function(classifier, analysis_mode, tidy_texts) {
     # Create a Document Term Matrix (DTM)
-    dtm <- corpus_dtm(tidy)
+    dtm <- corpus_dtm(tidy_texts)
 
     # Create the working data set
-    x_test <- codify(dtm, tidy)
+    x_test <- codify(dtm, tidy_texts)
     # x_test <- x_test %>% slice(-1)
 
     col <- read.csv(here(

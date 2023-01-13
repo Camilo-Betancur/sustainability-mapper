@@ -39,6 +39,9 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 
-# keeping empty PDF folder
+# Keeping empty PDF folder
 PDF/*
 !PDF/.gitignore
+
+# Old saved models
+Settings/Model/old

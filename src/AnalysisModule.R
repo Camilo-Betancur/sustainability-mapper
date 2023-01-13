@@ -56,8 +56,8 @@ run_mapper <- function() {
         cli_text("")
 
         cli_text(glue(col_green("1) "), "Start analysis from scratch."))
-        cli_text(glue(col_green("2) "), "Read saved data."
-        ))
+        cli_text(glue(col_green("2) "), "Read saved data."))
+        cli_text(glue(col_green("3) "), "Train the classification model."))
     })
 
     option <- as.character(invisible(readline()))
@@ -84,96 +84,42 @@ run_mapper <- function() {
         # Retrieving previously saved data
         cli_text("")
         cli_text(glue(
-            "Write the name of the saved file and press {col_green('ENTER')}",
+            "Write the name of the saved file and press {col_green('ENTER')} ",
             "to continue:"))
 
         name <- as.character(invisible(readline()))
 
         tidy <- from_saves(name)
 
+    } else if (option == '3') {
+        train_model(analysis_mode = analysis_mode)
+
+        run_mapper()
     }
 
     # ===== Classification model ===============================================
 
-    # ----- Data set-up for the classification model ----------
-    # Connect to the training database
-    conn <- dbConnect(RSQLite::SQLite(),
-                      here("Settings", "training_data.db"))
+    if (file.exists(here(
+        "Settings", "Model", glue("model_{analysis_mode}.Rds")))) {
+        # ----- Importing the classification model -----------------------------
+        classifier <- readRDS(glue("Settings/Model/model_{analysis_mode}.Rds"))
+    } else {
+        # ----- Train the model and save it for future use ---------------------
+        train_model(analysis_mode = analysis_mode)
 
-    # Import the data used for training the model
-    data_training <- dbGetQuery(conn, glue("SELECT * FROM {analysis_mode}"))
+        run_mapper()
+    }
 
-    dbDisconnect(conn)
+    # ----- Classifying the texts ----------------------------------------------
+    results <- map_texts(classifier = classifier,
+                         analysis_mode = analysis_mode,
+                         tidy_texts = tidy)
 
-    # Combine the training data set with the extracted texts
-    data_complete <- rbind(data_training, tidy)
-
-    data_complete <- data_complete %>%
-        mutate(Text = str_replace_all(data_complete$Text, '[^A-Za-z ]', ''))
-
-    # Capturing the data sets' length
-    nrows_data_t <- nrow(data_training)
-    nrows_data_c <- nrow(data_complete)
-
-    rm(data_training)
-
-    # Create a Document Term Matrix (DTM)
-    dtm <- corpus_dtm(data_complete)
-
-    # Create the working data set
-    working_dataset <- codify(dtm, data_complete)
-    rm(dtm)
-
-    # ----- Training the model -------------------------------------------------
-
-    # Set random seed
-    set.seed(612)
-
-    # Select training data
-    x_train <- working_dataset[1:nrows_data_t,]
-    x_train$Target <- factor(x_train$Target)
-
-    # Select test data
-    x_test <- working_dataset[nrows_data_t:nrows_data_c,]
-    x_test <- x_test %>% slice(-1)
-    x_test$Target <- factor(x_test$Target)
-
-    rm(working_dataset)
-
-    ncols_dtm <- dim(x_train)[2]
-
-    # Train the random forest model using the training data set
-    t0 <- Sys.time()
-    cli_alert_info(paste0("The model is being trained. Please wait, this ",
-                          "process can take several minutes."))
-    classifier <- randomForest(x = x_train[, -ncols_dtm],
-                               y = x_train$Target,
-                               ntree = 51)
-    rm(x_train)
-    cli_alert_success(paste0(
-        "The model was trained successfully after ",
-        difftime(time1 = Sys.time(), time2 = t0, units = "min"),
-        "minutes."))
-
-    # ----- Document classification --------------------------------------------
-
-    y_pred <- predict(classifier, newdata = x_test[, -ncols_dtm])
-    rm(x_test)
-
-    # Save the results in a character vector
-    classified <- character()
-    for (goal in y_pred) {classified = c(classified, goal)}
-
-    # Subset the data frame and paste the classified data
-    results <- data_complete %>%
-        slice(nrows_data_t+1: nrows_data_c)
-
-    rm(data_complete)
-
-    results$Target <- classified
+    # ----- Cleaning results for generating the reports ------------------------
 
     results <- identify_SDGs(results)
-    results <- results %>% dplyr::filter(SDG %in% glue("SDG {1:17}"))
+    write.csv(results, "THE RESULTS.csv")
+    results <- results %>% dplyr::filter(SDG != "No map")
     results <- as_tibble(results)
 
     # ====== Summaries =========================================================
