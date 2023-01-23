@@ -103,7 +103,7 @@ results <- as_tibble(results)
 
 # ====== Summaries =============================================================
 
-# Total matches by project -------------------------------> can feed a histogram
+# Total matches by project -----------------------------------------------------
 matches <- count_matches(results,
                          by = 'Goal',
                          sorted = 'Frequency')

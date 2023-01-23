@@ -64,14 +64,14 @@ train_model <- function(analysis_mode) {
                                    y = x_train$Target,
                                    ntree = 51)
 
-        save(classifier, file = here("Settings",
-                                     "Model",
-                                     "model_EUT.Rds"))
+        saveRDS(classifier, file = here("Settings",
+                                        "Model",
+                                        "model_EUT.Rds"))
 
         cli_alert_success(glue(
             "Model successfully exported to the path ",
             style_underline(style_italic(col_br_red(here(
-                "Settings", "Model", "model_EUT.Rdata"
+                "Settings", "Model", "model_EUT.Rds"
             ))))
         ))
     } else {cli_alert_warning("Analysis mode should be 'SDGs' or 'EUT'.")}
@@ -87,11 +87,19 @@ train_model <- function(analysis_mode) {
 }
 
 
-load_model <- function(analysis_mode) {
-    if (file.exists(
-        here("Settings", "Model", glue("model_{analysis_mode}.Rds"))
-    )) {
-        loadRDS(here("Settings", "Model", glue("model_{analysis_mode}.Rds")))
+load_model <- function(mode) {
+    if (mode == 'SDGs') {
+        model_path <- here("Settings",
+                           "Model",
+                           "model_SDGs.Rds")
+    } else if (mode == 'EUT') {
+        model_path <- here("Settings",
+                           "Model",
+                           "model_EUT.Rds")
+    }
+
+    if (file.exists(model_path)) {
+        model <- readRDS(model_path)
     } else {
         cli_alert_warning(
             glue("There is no trained model in the folder. ",
@@ -102,6 +110,7 @@ load_model <- function(analysis_mode) {
 
         train_model(analysis_mode)
     }
+    return(model)
 }
 
 analysis_mode = 'SDGs'

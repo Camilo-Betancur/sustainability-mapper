@@ -344,7 +344,7 @@ generate_network <- function(mapping_res) {
 
 generate_network_EUT <- function(mapping_res) {
     res <- mapping_res %>%
-        count_matches(by = 'Goal',
+        count_matches(by = 'SDG',
                       sorted = 'Frequency') %>%
         mutate(Frequency = 1)
 
@@ -356,7 +356,7 @@ generate_network_EUT <- function(mapping_res) {
     tibblist <- list()
     for (project in unique(projects_for_net)) {
         a <- res %>% filter(Project == project)
-        a <- as.list(a$Goal)
+        a <- as.list(a$SDG)
 
         a <- combn(a, 2, simplify = FALSE)
 
@@ -412,21 +412,20 @@ generate_network_EUT <- function(mapping_res) {
 
 # ===== Plotting functions =====================================================
 
-plot_results <- function(data,
-                         title = NULL,
-                         subtitle = NULL,
-                         xlabel,
-                         ylabel,
-                         font = "Roboto Condensed",
-                         fontsize_barlabs = 14,
-                         fontsize_title = 20,
-                         fontsize_subt = 16,
-                         fontsize_axis = 15,
-                         dpi = 96,
-                         scale = 1) {
+plot_results_SDGs <- function(data,
+                              title = NULL,
+                              subtitle = NULL,
+                              xlabel,
+                              ylabel,
+                              font = "Roboto Condensed",
+                              fontsize_barlabs = 14,
+                              fontsize_title = 20,
+                              fontsize_subt = 16,
+                              fontsize_axis = 15,
+                              dpi = 96,
+                              scale = 1) {
     fig <- ggplot(data,
                   aes(fct_rev(fct_reorder(SDG, Frequency)), Frequency)) +
-        geom_col(aes(fill = Color)) +
         geom_text(
             aes(SDG, Frequency, label = Frequency),
             angle = 90,
@@ -435,6 +434,7 @@ plot_results <- function(data,
             colour = 'white',
             size = fontsize_barlabs
         ) +
+        geom_col(aes(fill = Color)) +
         scale_fill_identity() +
         ggtitle(title, subtitle) +
         xlab(xlabel) +
@@ -574,18 +574,10 @@ plot_SDG_distribution <- function(analysis_mode,
                                   figname = NULL,
                                   dpi = 96,
                                   scale = 1,
-                                  transparent_bg = FALSE,
-                                  test = FALSE) {
+                                  transparent_bg = FALSE) {
     folder <- outputs_folder(analysis_mode, 'img')
 
-    if (test == FALSE) {
-        SDG_dist <- get_SDGs_proj(mapping_res)
-    } else if (test == TRUE){
-        SDG_dist <- tibble(Project = as.character(1:150),
-                           Frequency = base::round(rnorm(150, 8, 2), 0))
-    } else {
-        cli_abort("Argument 'test' must be either TRUE or FALSE")
-    }
+    SDG_dist <- get_SDGs_proj(mapping_res)
 
     histo <- ggplot(SDG_dist, aes(Frequency)) +
         geom_histogram(binwidth = binwidth, boundary = 0)
@@ -756,35 +748,35 @@ export_plot <- function(analysis_mode,
 }
 
 
-prompt_export_plot <- function(analysis_mode,
-                               data,
-                               title = NULL,
-                               subtitle = NULL,
-                               xlabel,
-                               ylabel,
-                               font = "Roboto Condensed",
-                               fontsize_barlabs = 14,
-                               fontsize_title = 20,
-                               fontsize_subt = 16,
-                               fontsize_axis = 15,
-                               figname = NULL,
-                               dpi = 96,
-                               scale = 1,
-                               transparent_bg = FALSE) {
+prompt_export_plot_SDGs <- function(analysis_mode,
+                                    data,
+                                    title = NULL,
+                                    subtitle = NULL,
+                                    xlabel,
+                                    ylabel,
+                                    font = "Roboto Condensed",
+                                    fontsize_barlabs = 14,
+                                    fontsize_title = 20,
+                                    fontsize_subt = 16,
+                                    fontsize_axis = 15,
+                                    figname = NULL,
+                                    dpi = 96,
+                                    scale = 1,
+                                    transparent_bg = FALSE) {
     folder <- here(outputs_folder(analysis_mode, 'img'))
 
-    plot <- plot_results(data,
-                         title,
-                         subtitle,
-                         xlabel,
-                         ylabel = ylabel,
-                         font = font,
-                         fontsize_barlabs = 8,
-                         fontsize_title = 20,
-                         fontsize_subt = 16,
-                         fontsize_axis = 15,
-                         dpi = 96,
-                         scale = 1)
+    plot <- plot_results_SDGs(data,
+                              title,
+                              subtitle,
+                              xlabel,
+                              ylabel = ylabel,
+                              font = font,
+                              fontsize_barlabs = 8,
+                              fontsize_title = 20,
+                              fontsize_subt = 16,
+                              fontsize_axis = 15,
+                              dpi = 96,
+                              scale = 1)
 
     print(plot)
 
@@ -853,7 +845,8 @@ prompt_export_graph <- function(analysis_mode,
 
     folder <- outputs_folder(analysis_mode, 'img')
 
-    g <- plot_network(mapping_res,
+    g <- plot_network(analysis_mode,
+                      mapping_res,
                       concentric,
                       FALSE,
                       figname,
@@ -880,7 +873,8 @@ prompt_export_graph <- function(analysis_mode,
     answer <- invisible(readline())
 
     if ((answer == 'y') || (answer == 'Y')) {
-        g <- plot_network(mapping_res,
+        g <- plot_network(analysis_mode,
+                          mapping_res,
                           concentric,
                           TRUE,
                           figname,
@@ -906,7 +900,8 @@ prompt_export_graph <- function(analysis_mode,
                  "but introduced {answer}. Try again")
         )
 
-        prompt_export_graph(mapping_res,
+        prompt_export_graph(analysis_mode,
+                            mapping_res,
                             concentric,
                             figname,
                             title,
@@ -935,11 +930,11 @@ prompt_export_histogram <- function(analysis_mode,
                                     figname = "SDG_distribution_proj",
                                     dpi = 96,
                                     scale = 1,
-                                    transparent_bg = FALSE,
-                                    test = FALSE) {
+                                    transparent_bg = FALSE) {
     folder <- outputs_folder(analysis_mode, 'img')
 
-    histogram <- plot_SDG_distribution(data,
+    histogram <- plot_SDG_distribution(analysis_mode,
+                                       data,
                                        binwidth,
                                        title,
                                        subtitle,
@@ -954,8 +949,7 @@ prompt_export_histogram <- function(analysis_mode,
                                        figname = figname,
                                        dpi = 96,
                                        scale = 1,
-                                       transparent_bg = FALSE,
-                                       test = test)
+                                       transparent_bg = FALSE)
 
     print(histogram)
 
@@ -968,7 +962,8 @@ prompt_export_histogram <- function(analysis_mode,
     answer <- invisible(readline())
 
     if ((answer == 'y') || (answer == 'Y')) {
-        histogram <- plot_SDG_distribution(data,
+        histogram <- plot_SDG_distribution(analysis_mode,
+                                           data,
                                            binwidth,
                                            title,
                                            subtitle,
@@ -983,8 +978,7 @@ prompt_export_histogram <- function(analysis_mode,
                                            figname,
                                            dpi,
                                            scale,
-                                           transparent_bg,
-                                           test)
+                                           transparent_bg)
 
         # cli_alert_success(glue(
         #     "Plot successfully exported to the path ",
@@ -1052,7 +1046,7 @@ isSingleString <- function(input) {
 
 # ===== EUT-specific functions ================================================
 
-plot_EUT_results <- function(data,
+plot_results_EUT <- function(data,
                              title = NULL,
                              subtitle = NULL,
                              xlabel,
@@ -1062,32 +1056,20 @@ plot_EUT_results <- function(data,
                              fontsize_title = 20,
                              fontsize_subt = 16,
                              fontsize_axis = 15,
-                             savefig = FALSE,
-                             figname = NULL,
                              dpi = 96,
-                             scale = 1,
-                             transparent_bg = FALSE) {
+                             scale = 1) {
+    xlabels <- str_replace_all(unique(data$SDG), "[ ]", "\n")
 
-    matches <- count_matches(data,
-                             by = 'Goal',
-                             sorted = 'Frequency')
-
-    matches_to_graph <- matches %>%
-        group_by(Goal) %>%
-        summarise(Frequency = sum(Frequency)) %>%
-        arrange(desc(Frequency)) %>%
-        mutate(Goal = str_replace_all(Goal, "[ ]", "\n"))
-
-    fig <- ggplot(matches_to_graph,
-                  aes(fct_rev(fct_reorder(Goal, Frequency)), Frequency)) +
+    fig <- ggplot(data,
+                  aes(fct_rev(fct_reorder(SDG, Frequency)), Frequency)) +
         geom_col() +
         geom_text(
-            aes(Goal, Frequency, label = Frequency),
+            aes(SDG, Frequency, label = Frequency),
             angle = 90,
             vjust = 0.35,
             hjust = 1.3,
             colour = 'white',
-            size = 10
+            size = fontsize_barlabs
         ) +
         ggtitle(title, subtitle) +
         xlab(xlabel) +
@@ -1115,8 +1097,103 @@ plot_EUT_results <- function(data,
                                          hjust = 0,
                                          margin = ggplot2::margin(0, 0, 25, 0),
                                          family = font)
-        )
+        ) +
+        scale_x_discrete(labels = xlabels)
     return(fig)
 }
 
 
+prompt_export_plot_EUT <- function(analysis_mode,
+                                   data,
+                                   title = NULL,
+                                   subtitle = NULL,
+                                   xlabel,
+                                   ylabel,
+                                   font = "Roboto Condensed",
+                                   fontsize_barlabs = 14,
+                                   fontsize_title = 20,
+                                   fontsize_subt = 16,
+                                   fontsize_axis = 15,
+                                   figname = NULL,
+                                   dpi = 96,
+                                   scale = 1,
+                                   transparent_bg = FALSE) {
+    folder <- here(outputs_folder(analysis_mode, 'img'))
+
+    plot <- plot_results_EUT(data,
+                             title,
+                             subtitle,
+                             xlabel = xlabel,
+                             ylabel = ylabel,
+                             font = font,
+                             fontsize_barlabs = 8,
+                             fontsize_title = 20,
+                             fontsize_subt = 16,
+                             fontsize_axis = 15,
+                             dpi = 96,
+                             scale = 1)
+
+    print(plot)
+
+    cli_h3("Do you wish to save this plot?")
+    cli_alert_info(paste0(
+        "Save plot: press 'y' or 'Y' and hit Enter\n",
+        "Discard: press 'n' or 'N' and hit Enter\n\n")
+    )
+
+    answer <- invisible(readline())
+
+    if ((answer == 'y') || (answer == 'Y')) {
+        plot <- plot_results_EUT(data,
+                                 title,
+                                 subtitle,
+                                 xlabel,
+                                 ylabel,
+                                 font,
+                                 fontsize_barlabs,
+                                 fontsize_title,
+                                 fontsize_subt,
+                                 fontsize_axis,
+                                 dpi = dpi,
+                                 scale = 1)
+
+        export_plot(analysis_mode,
+                    plot,
+                    figname = figname,
+                    dpi = dpi,
+                    scale = scale)
+    } else if ((answer == 'n') || (answer == 'N')) {
+        cli_alert_warning("Plot '{figname}.png' will not be saved")
+    } else {
+        cli_alert_warning(
+            glue("You should introduce either 'y' / 'Y' or 'n' / 'N' ",
+                 "but introduced {answer}. Try again"))
+        prompt_export_plot(data = data,
+                           title = title,
+                           subtitle = subtitle,
+                           xlabel = xlabel,
+                           ylabel = ylabel,
+                           font = font,
+                           fontsize_barlabs = fontsize_barlabs,
+                           fontsize_title = fontsize_title,
+                           fontsize_subt = fontsize_subt,
+                           fontsize_axis = fontsize_axis,
+                           figname = figname,
+                           dpi = dpi,
+                           scale = scale)
+    }
+}
+
+
+count_occurrence_EUT <- function(mapping_res) {
+    occurrence_EUT <- count_matches(mapping_res,
+                                    by = 'SDG',
+                                    sorted = 'Frequency')
+
+    occurrence_EUT <- occurrence_EUT %>%
+        group_by(SDG) %>%
+        summarise(Frequency = sum(Frequency)) %>%
+        arrange(desc(Frequency))
+
+    return(occurrence_EUT)
+}

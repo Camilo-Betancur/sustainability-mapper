@@ -185,7 +185,7 @@ tidify <- function(df,
     cli_progress_done(result = "done")
 
     tibblist <- tibblist %>%
-        mutate(Target = 'No map')
+        mutate(Target = 'No map.NA')
 
     # Ends the function's general timer
     t_f_general <- Sys.time()
