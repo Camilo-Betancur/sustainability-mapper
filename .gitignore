@@ -45,3 +45,7 @@ PDF/*
 
 # Old saved models
 Settings/Model/old
+
+# Debug and reporting
+Debug
+Markdown
