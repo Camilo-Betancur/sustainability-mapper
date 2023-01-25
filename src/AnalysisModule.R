@@ -90,12 +90,22 @@ run_mapper <- function() {
 
     } else if (option == '2') {
         # Retrieving previously saved data
-        cli_text("")
-        cli_text(glue(
-            "Write the name of the saved file and press {col_green('ENTER')} ",
-            "to continue:"))
+        repeat{
+            cli_text("")
+            cli_text(glue(
+                "Write the name of the saved file and press {col_green('ENTER')} ",
+                "to continue:"))
 
-        name <- as.character(invisible(readline()))
+            name <- as.character(invisible(readline()))
+
+            if (file.exists(here("Saves", glue(name, ".json")))) {
+                break
+            } else {cli_alert_warning(glue(
+                "You must write the name of a {col_red(.json)} file inside the ",
+                col_red(here("Saves")),
+                " folder."))
+            }
+        }
 
         tidy <- from_saves(name)
 
@@ -292,7 +302,8 @@ run_mapper <- function() {
         prompt_export_plot_SDGs(analysis_mode,
                                 occurrence_SDG,
                                 title = 'Occurrence of the SDGs',
-                                subtitle = '',
+                                subtitle = paste("Number of projects in",
+                                                 " which each SDG appears"),
                                 xlabel = 'SDG',
                                 ylabel = 'Number of projects',
                                 figname = 'occurrence')
@@ -300,15 +311,16 @@ run_mapper <- function() {
         prompt_export_plot_SDGs(analysis_mode,
                                 matches_SDG,
                                 title = "Matches of the SDGs",
-                                subtitle = '',
+                                subtitle = "Total sentences mapped to each SDG",
                                 xlabel = "SDG",
                                 ylabel = "Number of matches",
                                 figname = 'matches')
 
         prompt_export_plot_SDGs(analysis_mode,
                                 main_SDGs,
-                                title = 'Testing main',
-                                subtitle = '',
+                                title = 'Main SDG',
+                                subtitle = paste("Most dominant SDGs across",
+                                                 " the portfolio"),
                                 xlabel = 'SDG',
                                 ylabel = 'Number of projects',
                                 figname = 'main_SDG')
@@ -320,20 +332,27 @@ run_mapper <- function() {
                                 subtitle = "mapped by project",
                                 figname = "SDGs_by_project")
 
+        write.csv(results, "results_debug_network.csv")
+
         prompt_export_graph(analysis_mode,
                             results,
-                            figname = 'SDG_interactions')
+                            figname = 'SDG_connections',
+                            title = "Connections between the SDGs",
+                            subtitle = "How often the SDGs coexist")
     } else if (analysis_mode == 'EUT') {
         prompt_export_plot_EUT(analysis_mode,
                                occurrence_EUT,
-                               title = 'Occurrence of the EUT Goals',
-                               subtitle = "",
+                               title = "Occurrence of the EU Taxonomy Goals",
+                               subtitle = paste("Number of projects in which",
+                                                " each Goal appears"),
                                xlabel = 'EU Taxonomy Goal',
                                ylabel = 'Number of projects',
                                figname = 'occurrence')
 
         prompt_export_graph(analysis_mode,
                             results,
-                            figname = 'EUT_interactions')
+                            figname = 'EUT_connections',
+                            title = "Connections between the EU Taxonomy Goals",
+                            subtitle = "How often the Goals coexist")
     }
 }

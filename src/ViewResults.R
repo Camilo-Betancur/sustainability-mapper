@@ -424,8 +424,12 @@ plot_results_SDGs <- function(data,
                               fontsize_axis = 15,
                               dpi = 96,
                               scale = 1) {
-    fig <- ggplot(data,
-                  aes(fct_rev(fct_reorder(SDG, Frequency)), Frequency)) +
+    data$SDG <- factor(data$SDG)
+
+    data$SDG <- fct_reorder(data$SDG, data$Frequency, sort, .desc = TRUE)
+
+    fig <- ggplot(data, aes(SDG, Frequency)) +
+        geom_col(aes(fill = Color)) +
         geom_text(
             aes(SDG, Frequency, label = Frequency),
             angle = 90,
@@ -434,7 +438,6 @@ plot_results_SDGs <- function(data,
             colour = 'white',
             size = fontsize_barlabs
         ) +
-        geom_col(aes(fill = Color)) +
         scale_fill_identity() +
         ggtitle(title, subtitle) +
         xlab(xlabel) +
@@ -507,8 +510,11 @@ plot_network <- function(analysis_mode,
             width = weight
         )) +
         scale_edge_colour_identity() +
-        scale_edge_width(range = c(0.1, 0.8), name = 'Weight') +
-        scale_edge_alpha_continuous(range = c(0.05, 1), name = 'Weight') +
+        scale_edge_width(range = c(0.1, 3), name = 'Weight', position = 'bottom') +
+        scale_edge_alpha_continuous(range = c(0.6, 0.8),
+                                    limits = c(min(E(net)$weight),
+                                               max(E(net)$weight)),
+                                    name = 'Weight') +
         # Nodes' settings
         geom_node_point(aes(
             size = degree,
@@ -523,8 +529,12 @@ plot_network <- function(analysis_mode,
             family = font
         ) +
         scale_colour_identity() +
-        scale_size_continuous(name = 'Degree', range = c(1, 8)) +
-        scale_label_size_continuous(range = c(0.8, 1.4)) +
+        scale_size_continuous(name = 'Degree',
+                              limits = c(min(V(net)$degree),
+                                         max(V(net)$degree))) +
+        scale_label_size_continuous(range = c(1, 2),
+                                    limits = c(min(V(net)$degree),
+                                               max(V(net)$degree))) +
         # General settings and aesthetics configurations
         theme_graph(
             background = 'white',
@@ -538,7 +548,13 @@ plot_network <- function(analysis_mode,
         ) +
         # Title
         ggtitle(title,
-                subtitle)
+                subtitle) +
+        theme(legend.position = 'bottom',
+              legend.direction = 'horizontal',
+              legend.box = 'vertical',
+              legend.margin = ggplot2::margin(),
+              legend.box.margin = ggplot2::margin()
+              )
 
     if (savefig == TRUE) {
         if (isSingleString(figname)) {
@@ -756,11 +772,11 @@ prompt_export_plot_SDGs <- function(analysis_mode,
                                     ylabel,
                                     font = "Roboto Condensed",
                                     fontsize_barlabs = 14,
-                                    fontsize_title = 20,
-                                    fontsize_subt = 16,
-                                    fontsize_axis = 15,
+                                    fontsize_title = 62.5,
+                                    fontsize_subt = 50,
+                                    fontsize_axis = 30,
                                     figname = NULL,
-                                    dpi = 96,
+                                    dpi = 300,
                                     scale = 1,
                                     transparent_bg = FALSE) {
     folder <- here(outputs_folder(analysis_mode, 'img'))
@@ -771,7 +787,7 @@ prompt_export_plot_SDGs <- function(analysis_mode,
                               xlabel,
                               ylabel = ylabel,
                               font = font,
-                              fontsize_barlabs = 8,
+                              fontsize_barlabs = 7,
                               fontsize_title = 20,
                               fontsize_subt = 16,
                               fontsize_axis = 15,
@@ -789,18 +805,18 @@ prompt_export_plot_SDGs <- function(analysis_mode,
     answer <- invisible(readline())
 
     if ((answer == 'y') || (answer == 'Y')) {
-        plot <- plot_results(data,
-                             title,
-                             subtitle,
-                             xlabel,
-                             ylabel,
-                             font,
-                             fontsize_barlabs,
-                             fontsize_title,
-                             fontsize_subt,
-                             fontsize_axis,
-                             dpi = dpi,
-                             scale = 1)
+        plot <- plot_results_SDGs(data,
+                                  title,
+                                  subtitle,
+                                  xlabel,
+                                  ylabel,
+                                  font,
+                                  fontsize_barlabs,
+                                  fontsize_title,
+                                  fontsize_subt,
+                                  fontsize_axis,
+                                  dpi = dpi,
+                                  scale = 1)
 
         export_plot(analysis_mode,
                     plot,
@@ -829,7 +845,8 @@ prompt_export_plot_SDGs <- function(analysis_mode,
     }
 }
 
-
+# This function takes one mapping summary from an analysis mode and returns a
+# corresponding graph.
 prompt_export_graph <- function(analysis_mode,
                                 mapping_res,
                                 concentric = FALSE,
@@ -837,14 +854,16 @@ prompt_export_graph <- function(analysis_mode,
                                 title = "Interactions between the SDGs",
                                 subtitle = "In the World Bank's portfolio",
                                 font = "Roboto Condensed",
-                                fontsize_base = 15,
-                                fontsize_title = 20,
-                                fontsize_subt = 16,
-                                dpi = 96,
+                                fontsize_base = 30,
+                                fontsize_title = 40,
+                                fontsize_subt = 32,
+                                dpi = 300,
                                 scale = 1) {
 
+    # Loads the folder names in which the graph will be exported
     folder <- outputs_folder(analysis_mode, 'img')
 
+    # Creates graph
     g <- plot_network(analysis_mode,
                       mapping_res,
                       concentric,
@@ -923,12 +942,12 @@ prompt_export_histogram <- function(analysis_mode,
                                     xlabel = "Number of Goals",
                                     ylabel = "Number of projects",
                                     font = "Roboto Condensed",
-                                    fontsize_title = 20,
-                                    fontsize_subt = 16,
-                                    fontsize_axis = 15,
+                                    fontsize_title = 62.5,
+                                    fontsize_subt = 50,
+                                    fontsize_axis = 30,
                                     kde = FALSE,
                                     figname = "SDG_distribution_proj",
-                                    dpi = 96,
+                                    dpi = 300,
                                     scale = 1,
                                     transparent_bg = FALSE) {
     folder <- outputs_folder(analysis_mode, 'img')
@@ -1052,7 +1071,7 @@ plot_results_EUT <- function(data,
                              xlabel,
                              ylabel,
                              font = "Roboto Condensed",
-                             fontsize_barlabs = 14,
+                             fontsize_barlabs = 7,
                              fontsize_title = 20,
                              fontsize_subt = 16,
                              fontsize_axis = 15,
@@ -1111,11 +1130,11 @@ prompt_export_plot_EUT <- function(analysis_mode,
                                    ylabel,
                                    font = "Roboto Condensed",
                                    fontsize_barlabs = 14,
-                                   fontsize_title = 20,
-                                   fontsize_subt = 16,
-                                   fontsize_axis = 15,
+                                   fontsize_title = 62.5,
+                                   fontsize_subt = 50,
+                                   fontsize_axis = 30,
                                    figname = NULL,
-                                   dpi = 96,
+                                   dpi = 300,
                                    scale = 1,
                                    transparent_bg = FALSE) {
     folder <- here(outputs_folder(analysis_mode, 'img'))
@@ -1126,7 +1145,7 @@ prompt_export_plot_EUT <- function(analysis_mode,
                              xlabel = xlabel,
                              ylabel = ylabel,
                              font = font,
-                             fontsize_barlabs = 8,
+                             fontsize_barlabs = 7,
                              fontsize_title = 20,
                              fontsize_subt = 16,
                              fontsize_axis = 15,

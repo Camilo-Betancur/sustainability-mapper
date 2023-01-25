@@ -1,4 +1,4 @@
-app <- function() {
+{app <- function() {
     source(here::here('src', 'Initialiser.R'))
 
     initialise_app()
@@ -6,8 +6,7 @@ app <- function() {
     run_mapper()
 }
 
-app()
-
+app()}
 
 # ===== MANUAL IMPLEMENTATION OF THE APP =======================================
 # Un-comment the following code to start a manual run of the mapper
