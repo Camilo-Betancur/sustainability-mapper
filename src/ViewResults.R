@@ -482,7 +482,8 @@ plot_network <- function(analysis_mode,
                          fontsize_title = 20,
                          fontsize_subt = 16,
                          dpi = 96,
-                         scale = 1) {
+                         scale = 1,
+                         colorbar_label = 3) {
     folder <- outputs_folder(analysis_mode, 'img')
 
     if (analysis_mode == 'SDGs') {
@@ -494,41 +495,50 @@ plot_network <- function(analysis_mode,
     }
 
     if (concentric == TRUE) {
-        ggraph(net, 'focus', focus = node_is_center()) +
+        g <- ggraph(net, 'focus', focus = node_is_center()) +
             ggforce::geom_circle(aes(x0 = 0, y0 = 0, r = r),
                                  data.frame(r = 1:3),
                                  colour = 'grey')
     } else {
-        g <- ggraph(net, layout = 'igraph', algorithm = 'nicely')
+        # could also be ggraph(net, layout = 'igraph', algorithm = 'nicely')
+        g <- ggraph(net, layout = 'igraph', algorithm = 'gem')
     }
 
     g <- g +
         # Edges' settings
         geom_edge_link(aes(
-            colour = color,
-            alpha = weight,
+            colour = weight,
+           # alpha = weight,
             width = weight
         )) +
-        scale_edge_colour_identity() +
-        scale_edge_width(range = c(0.1, 3), name = 'Weight', position = 'bottom') +
-        scale_edge_alpha_continuous(range = c(0.6, 0.8),
-                                    limits = c(min(E(net)$weight),
-                                               max(E(net)$weight)),
-                                    name = 'Weight') +
+        scale_edge_colour_viridis(
+            alpha = 0.7,
+            begin = 0.1,
+            end = 0.8,
+            direction = -1,
+            discrete = FALSE,
+            option = "C",
+            name = 'Weight',
+            position = 'bottom',
+            guide = guide_edge_colorbar(barwidth = 11,
+                                        label.vjust = colorbar_label)) +
+        scale_edge_width(range = c(0.1, 2), guide = 'none') +
         # Nodes' settings
-        geom_node_point(aes(
-            size = degree,
-            colour = color),
+        geom_node_point(aes(size = degree,
+                            fill = color),
+                        shape = 21,
+                        color = 'gray4'
         ) +
-        geom_node_text(aes(
-            label = names(as.list(V(net))),
-            size = degree),
-            show.legend = FALSE,
-            colour = 'gray4',
-            repel = TRUE,
-            family = font
+        geom_node_label(aes(label = names(as.list(V(net))),
+                            size = degree),
+                        show.legend = FALSE,
+                        alpha = 0.7,
+                        colour = 'black',
+                        repel = TRUE,
+                        family = font,
+                        label.size = NA
         ) +
-        scale_colour_identity() +
+        scale_fill_identity() +
         scale_size_continuous(name = 'Degree',
                               limits = c(min(V(net)$degree),
                                          max(V(net)$degree))) +
@@ -544,7 +554,7 @@ plot_network <- function(analysis_mode,
             subtitle_size = fontsize_subt,
             base_size = fontsize_base,
             base_family = font,
-            plot_margin = ggplot2::margin(15, 15, 15, 15),
+            plot_margin = ggplot2::margin(15, 15, 5, 15),
         ) +
         # Title
         ggtitle(title,
@@ -553,7 +563,11 @@ plot_network <- function(analysis_mode,
               legend.direction = 'horizontal',
               legend.box = 'vertical',
               legend.margin = ggplot2::margin(),
-              legend.box.margin = ggplot2::margin()
+              legend.box.margin = ggplot2::margin(),
+              legend.box.spacing = ggplot2::margin(0, 0, 0, 0),
+              legend.key.size = unit(0.25, "cm"),
+              legend.spacing = unit(0.25, "cm"),
+              plot.subtitle = element_text(margin = ggplot2::margin(0, 0, 5, 0))
               )
 
     if (savefig == TRUE) {
@@ -858,7 +872,8 @@ prompt_export_graph <- function(analysis_mode,
                                 fontsize_title = 40,
                                 fontsize_subt = 32,
                                 dpi = 300,
-                                scale = 1) {
+                                scale = 1,
+                                colorbar_label = 7) {
 
     # Loads the folder names in which the graph will be exported
     folder <- outputs_folder(analysis_mode, 'img')
@@ -876,7 +891,8 @@ prompt_export_graph <- function(analysis_mode,
                       fontsize_title = 20,
                       fontsize_subt = 16,
                       dpi = 96,
-                      scale = 1)
+                      scale = 1,
+                      colorbar_label = 3)
 
     print(g)
 
@@ -904,7 +920,8 @@ prompt_export_graph <- function(analysis_mode,
                           fontsize_title,
                           fontsize_subt,
                           dpi,
-                          scale)
+                          scale,
+                          colorbar_label)
 
         # cli_alert_success(glue(
         #     "Plot successfully exported to the path ",
