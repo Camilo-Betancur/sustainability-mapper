@@ -483,7 +483,8 @@ plot_network <- function(analysis_mode,
                          fontsize_subt = 16,
                          dpi = 96,
                          scale = 1,
-                         colorbar_label = 3) {
+                         vjust_colorbar_label = -2.3,
+                         vjust_legend_title = 0.88) {
     folder <- outputs_folder(analysis_mode, 'img')
 
     if (analysis_mode == 'SDGs') {
@@ -520,8 +521,9 @@ plot_network <- function(analysis_mode,
             option = "C",
             name = 'Weight',
             position = 'bottom',
-            guide = guide_edge_colorbar(barwidth = 11,
-                                        label.vjust = colorbar_label)) +
+            guide = guide_edge_colourbar(barwidth = 8,
+                                         label.vjust = vjust_colorbar_label,
+                                         title.vjust = vjust_legend_title)) +
         scale_edge_width(range = c(0.1, 2), guide = 'none') +
         # Nodes' settings
         geom_node_point(aes(size = degree,
@@ -541,7 +543,10 @@ plot_network <- function(analysis_mode,
         scale_fill_identity() +
         scale_size_continuous(name = 'Degree',
                               limits = c(min(V(net)$degree),
-                                         max(V(net)$degree))) +
+                                         max(V(net)$degree)),
+                              guide = guide_legend(byrow = TRUE,
+                                                   label.position = "bottom",
+                                                   label.vjust = 3)) +
         scale_label_size_continuous(range = c(1, 2),
                                     limits = c(min(V(net)$degree),
                                                max(V(net)$degree))) +
@@ -554,21 +559,26 @@ plot_network <- function(analysis_mode,
             subtitle_size = fontsize_subt,
             base_size = fontsize_base,
             base_family = font,
-            plot_margin = ggplot2::margin(15, 15, 5, 15),
+            plot_margin = ggplot2::margin(15, 15, 5, 15)
         ) +
         # Title
         ggtitle(title,
                 subtitle) +
         theme(legend.position = 'bottom',
               legend.direction = 'horizontal',
-              legend.box = 'vertical',
+              legend.box = 'horizontal',
               legend.margin = ggplot2::margin(),
               legend.box.margin = ggplot2::margin(),
-              legend.box.spacing = ggplot2::margin(0, 0, 0, 0),
-              legend.key.size = unit(0.25, "cm"),
-              legend.spacing = unit(0.25, "cm"),
+              legend.key.width = unit(0.7, "cm"),
+              legend.key.height = unit(0.2, "cm"),
+              legend.spacing = unit(1, "cm"),
+              legend.text = element_text(margin = ggplot2::margin()),
+              legend.box.just = "top",
               plot.subtitle = element_text(margin = ggplot2::margin(0, 0, 5, 0))
-              )
+              ) +
+        guides(colour = guide_legend(byrow = TRUE),
+               width = guide_legend(byrow = TRUE),
+               )
 
     if (savefig == TRUE) {
         if (isSingleString(figname)) {
@@ -872,8 +882,7 @@ prompt_export_graph <- function(analysis_mode,
                                 fontsize_title = 40,
                                 fontsize_subt = 32,
                                 dpi = 300,
-                                scale = 1,
-                                colorbar_label = 7) {
+                                scale = 1) {
 
     # Loads the folder names in which the graph will be exported
     folder <- outputs_folder(analysis_mode, 'img')
@@ -891,8 +900,7 @@ prompt_export_graph <- function(analysis_mode,
                       fontsize_title = 20,
                       fontsize_subt = 16,
                       dpi = 96,
-                      scale = 1,
-                      colorbar_label = 3)
+                      scale = 1)
 
     print(g)
 
@@ -921,7 +929,7 @@ prompt_export_graph <- function(analysis_mode,
                           fontsize_subt,
                           dpi,
                           scale,
-                          colorbar_label)
+                          vjust_colorbar_label = 7)
 
         # cli_alert_success(glue(
         #     "Plot successfully exported to the path ",
@@ -1093,7 +1101,8 @@ plot_results_EUT <- function(data,
                              fontsize_subt = 16,
                              fontsize_axis = 15,
                              dpi = 96,
-                             scale = 1) {
+                             scale = 1,
+                             y_axis_lineheight = 1) {
     xlabels <- str_replace_all(unique(data$SDG), "[ ]", "\n")
 
     fig <- ggplot(data,
@@ -1120,7 +1129,8 @@ plot_results_EUT <- function(data,
                                         margin = ggplot2::margin(0, 15, 0, 0)),
             axis.text.x = element_text(angle = 90,
                                        vjust = 0.5,
-                                       hjust = 0),
+                                       hjust = 0,
+                                       lineheight = y_axis_lineheight),
             axis.text = element_text(size = fontsize_axis,
                                      family = font),
             legend.position = 'none',
@@ -1191,7 +1201,8 @@ prompt_export_plot_EUT <- function(analysis_mode,
                                  fontsize_subt,
                                  fontsize_axis,
                                  dpi = dpi,
-                                 scale = 1)
+                                 scale = 1,
+                                 y_axis_lineheight = 0.35)
 
         export_plot(analysis_mode,
                     plot,

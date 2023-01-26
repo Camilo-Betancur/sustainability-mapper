@@ -332,8 +332,6 @@ run_mapper <- function() {
                                 subtitle = "mapped by project",
                                 figname = "SDGs_by_project")
 
-        write.csv(results, "results_debug_network.csv")
-
         prompt_export_graph(analysis_mode,
                             results,
                             figname = 'SDG_connections',
