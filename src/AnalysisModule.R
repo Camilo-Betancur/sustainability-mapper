@@ -237,6 +237,10 @@ run_mapper <- function() {
 
         if (analysis_mode == 'SDGs' ) {
             export_summary(analysis_mode,
+                           results,
+                           'raw_results')
+
+            export_summary(analysis_mode,
                            matches_T,
                            'matches_project_total')
             export_summary(analysis_mode,
@@ -274,11 +278,14 @@ run_mapper <- function() {
                            'results_matrix_rel')
         } else if (analysis_mode == 'EUT') {
             export_summary(analysis_mode,
+                           results,
+                           'raw_results')
+            export_summary(analysis_mode,
                            matches_T,
-                           'matches_T')
+                           'matches_EUT_proj')
             export_summary(analysis_mode,
                            occurrence_EUT,
-                           'occurrence_EUT')
+                           'occurrence_EUT_total')
             export_summary(analysis_mode,
                            matrix_absolute,
                            'results_matrix_abs')
@@ -340,17 +347,17 @@ run_mapper <- function() {
     } else if (analysis_mode == 'EUT') {
         prompt_export_plot_EUT(analysis_mode,
                                occurrence_EUT,
-                               title = "Occurrence of the EU Taxonomy Goals",
+                               title = "Occurrence of the EU Taxonomy Objectives",
                                subtitle = paste("Number of projects in which",
-                                                " each Goal appears"),
-                               xlabel = 'EU Taxonomy Goal',
+                                                " each Objective appears"),
+                               xlabel = 'EU Taxonomy Objective',
                                ylabel = 'Number of projects',
                                figname = 'occurrence')
 
         prompt_export_graph(analysis_mode,
                             results,
                             figname = 'EUT_connections',
-                            title = "Connections between the EU Taxonomy Goals",
-                            subtitle = "How often the Goals coexist")
+                            title = "Connections between the EU Taxonomy Objectives",
+                            subtitle = "How often the Objectives coexist")
     }
 }

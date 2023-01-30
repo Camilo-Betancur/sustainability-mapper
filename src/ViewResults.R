@@ -483,8 +483,8 @@ plot_network <- function(analysis_mode,
                          fontsize_subt = 16,
                          dpi = 96,
                          scale = 1,
-                         vjust_colorbar_label = -2.3,
-                         vjust_legend_title = 0.88) {
+                         weight_barheight = 6,
+                         degree_keyheight = 0.75) {
     folder <- outputs_folder(analysis_mode, 'img')
 
     if (analysis_mode == 'SDGs') {
@@ -507,24 +507,12 @@ plot_network <- function(analysis_mode,
 
     g <- g +
         # Edges' settings
-        geom_edge_link(aes(
+        geom_edge_arc(aes(
             colour = weight,
            # alpha = weight,
             width = weight
-        )) +
-        scale_edge_colour_viridis(
-            alpha = 0.7,
-            begin = 0.1,
-            end = 0.8,
-            direction = -1,
-            discrete = FALSE,
-            option = "C",
-            name = 'Weight',
-            position = 'bottom',
-            guide = guide_edge_colourbar(barwidth = 8,
-                                         label.vjust = vjust_colorbar_label,
-                                         title.vjust = vjust_legend_title)) +
-        scale_edge_width(range = c(0.1, 2), guide = 'none') +
+        ),
+        strength = 0.25) +
         # Nodes' settings
         geom_node_point(aes(size = degree,
                             fill = color),
@@ -534,22 +522,53 @@ plot_network <- function(analysis_mode,
         geom_node_label(aes(label = names(as.list(V(net))),
                             size = degree),
                         show.legend = FALSE,
-                        alpha = 0.7,
+                        alpha = 0.85,
                         colour = 'black',
                         repel = TRUE,
                         family = font,
                         label.size = NA
         ) +
+        # Scales
         scale_fill_identity() +
-        scale_size_continuous(name = 'Degree',
-                              limits = c(min(V(net)$degree),
-                                         max(V(net)$degree)),
-                              guide = guide_legend(byrow = TRUE,
-                                                   label.position = "bottom",
-                                                   label.vjust = 3)) +
-        scale_label_size_continuous(range = c(1, 2),
+        scale_edge_width(range = c(0.1, 3), guide = 'none') +
+        scale_edge_colour_viridis(
+            breaks = as.integer(quantile(E(net)$weight,
+                                         probs = seq(0.25, 1, by = 0.25))),
+            alpha = 0.7,
+            begin = 0.1,
+            end = 0.8,
+            direction = -1,
+            discrete = FALSE,
+            option = "C",
+            name = 'Weight',
+            position = 'left',
+            guide = guide_edge_colourbar(
+                barwidth = weight_barheight / (1.618 * 4),
+                barheight = weight_barheight,
+                label.position = "right",
+
+                )) +
+        scale_size_continuous(
+            name = 'Degree',
+            range = c(4, 8),
+            breaks = as.integer(quantile(V(net)$degree,
+                                         probs = seq(0.25, 1, by = 0.25))),
+            limits = c(min(V(net)$degree),
+                       max(V(net)$degree)),
+            guide = guide_legend(
+                keyheight = unit(degree_keyheight, "cm"),
+                keywidth = unit(0.7, "cm"),
+                label.position = "right",
+                legend.position = "bottom",
+                label.hjust = unit(-0.15, "cm"),
+                title.hjust = 0.3,
+                reverse = TRUE
+            )
+        ) +
+        scale_label_size_continuous(range = c(3, 4),
                                     limits = c(min(V(net)$degree),
-                                               max(V(net)$degree))) +
+                                               max(V(net)$degree)),
+                                    trans = 'log') +
         # General settings and aesthetics configurations
         theme_graph(
             background = 'white',
@@ -563,37 +582,24 @@ plot_network <- function(analysis_mode,
         ) +
         # Title
         ggtitle(title,
-                subtitle) +
-        theme(legend.position = 'bottom',
-              legend.direction = 'horizontal',
-              legend.box = 'horizontal',
-              legend.margin = ggplot2::margin(),
-              legend.box.margin = ggplot2::margin(),
-              legend.key.width = unit(0.7, "cm"),
-              legend.key.height = unit(0.2, "cm"),
-              legend.spacing = unit(1, "cm"),
-              legend.text = element_text(margin = ggplot2::margin()),
-              legend.box.just = "top",
-              plot.subtitle = element_text(margin = ggplot2::margin(0, 0, 5, 0))
-              ) +
+                subtitle
+        ) +
+        theme(
+            legend.position = 'right',
+            legend.direction = 'vertical',
+            legend.box = 'vertical',
+            legend.margin = ggplot2::margin(),
+            legend.box.margin = ggplot2::margin(),
+            legend.box.just = 'top',
+            legend.key.width = unit(0.7, "cm"),
+            legend.key.height = unit(0.3, "cm"),
+            legend.spacing = unit(1, "cm"),
+            legend.text = element_text(margin = ggplot2::margin(0, 0, 0, 0)),
+            plot.subtitle = element_text(margin = ggplot2::margin(0, 0, 5, 0))
+        ) +
         guides(colour = guide_legend(byrow = TRUE),
                width = guide_legend(byrow = TRUE),
-               )
-
-    if (savefig == TRUE) {
-        if (isSingleString(figname)) {
-            ggsave(here(glue('{folder}/{figname}.png')),
-                   plot = g,
-                   dpi = dpi,
-                   scale = scale)
-
-            cli_alert_success(glue(
-                "Graph successfully exported to the path ",
-                style_underline(style_italic(
-                    col_br_red("\'{folder}/{figname}.png\'")))
-            ))
-        }
-    }
+        )
     return(g)
 }
 
@@ -788,6 +794,60 @@ export_plot <- function(analysis_mode,
 }
 
 
+export_graph <- function(analysis_mode,
+                         plot,
+                         figname,
+                         transparent_bg = FALSE,
+                         dpi = 96,
+                         scale = 1,
+                         plot_width = 15.5) {
+    folder <- here(outputs_folder(analysis_mode, 'img'))
+
+    if (isSingleString(figname)) {
+        if (transparent_bg == FALSE){
+            ggsave(
+                here(glue('{folder}/{figname}.png')),
+                plot = plot,
+                device = 'png',
+                width = plot_width,
+                height = plot_width * 0.618,
+                unit = 'cm',
+                scale = scale,
+                dpi = dpi,
+                bg = 'white')
+
+            cli_alert_success(glue(
+                "Plot successfully exported to the path ",
+                style_underline(style_italic(col_br_red(glue(
+                    "\'{folder}/{figname}.png\'"))))
+            ))
+        } else if (transparent_bg == TRUE) {
+            ggsave(
+                here(glue('{folder}/{figname}.png')),
+                plot = plot,
+                device = 'png',
+                width = plot_width,
+                height = plot_width * 0.618,
+                unit = 'cm',
+                scale = scale,
+                dpi = dpi)
+
+            cli_alert_success(glue(
+                "Plot successfully exported to the path ",
+                style_underline(style_italic(
+                    col_br_red("\'{folder}/{figname}.png\'\n\n"))
+                )
+            ))
+        } else {
+            cli_abort(paste0("The argument 'transparent_bg' must be ",
+                             "either TRUE or FALSE"))
+        }
+    } else {
+        cli_abort("The argument 'figname' must be a single string")
+    }
+}
+
+
 prompt_export_plot_SDGs <- function(analysis_mode,
                                     data,
                                     title = NULL,
@@ -883,7 +943,6 @@ prompt_export_graph <- function(analysis_mode,
                                 fontsize_subt = 32,
                                 dpi = 300,
                                 scale = 1) {
-
     # Loads the folder names in which the graph will be exported
     folder <- outputs_folder(analysis_mode, 'img')
 
@@ -924,12 +983,15 @@ prompt_export_graph <- function(analysis_mode,
                           title,
                           subtitle,
                           font,
-                          fontsize_base,
-                          fontsize_title,
-                          fontsize_subt,
-                          dpi,
-                          scale,
-                          vjust_colorbar_label = 7)
+                          fontsize_base = 25,
+                          fontsize_title = 40,
+                          fontsize_subt = 30,
+                          dpi = 300,
+                          scale = 1,
+                          weight_barheight = 4,
+                          degree_keyheight = 0.25)
+
+        export_graph(analysis_mode, g, figname, dpi = dpi)
 
         # cli_alert_success(glue(
         #     "Plot successfully exported to the path ",
@@ -1239,7 +1301,7 @@ count_occurrence_EUT <- function(mapping_res) {
 
     occurrence_EUT <- occurrence_EUT %>%
         group_by(SDG) %>%
-        summarise(Frequency = sum(Frequency)) %>%
+        summarise(Frequency = n()) %>%
         arrange(desc(Frequency))
 
     return(occurrence_EUT)
