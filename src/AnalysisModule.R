@@ -349,7 +349,7 @@ run_mapper <- function() {
                                occurrence_EUT,
                                title = "Occurrence of the EU Taxonomy Objectives",
                                subtitle = paste("Number of projects in which",
-                                                " each Objective appears"),
+                                                "each Objective appears"),
                                xlabel = 'EU Taxonomy Objective',
                                ylabel = 'Number of projects',
                                figname = 'occurrence')

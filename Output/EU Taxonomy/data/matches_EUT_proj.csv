@@ -71,12 +71,12 @@
 "P158418","Climate adaptation",3
 "P158522","Water",13
 "P158522","Climate adaptation",4
-"P158522","Climate mitigation",4
+"P158522","Climate mitigation",3
 "P158756","Water",2
 "P158756","Biodiversity",1
 "P158756","Climate mitigation",1
 "P158756","Pollution prevention",1
-"P160408","Climate adaptation",22
+"P160408","Climate adaptation",21
 "P160408","Water",8
 "P160408","Climate mitigation",7
 "P160911","Water",36
@@ -90,9 +90,9 @@
 "P163533","Water",8
 "P163533","Climate adaptation",2
 "P163533","Climate mitigation",1
-"P164047","Climate adaptation",17
-"P164047","Biodiversity",12
-"P164047","Climate mitigation",10
+"P164047","Climate adaptation",15
+"P164047","Biodiversity",11
+"P164047","Climate mitigation",11
 "P164047","Water",1
 "P165054","Climate mitigation",1
 "P165129","Climate mitigation",10
@@ -107,7 +107,7 @@
 "P168862","Water",2
 "P168862","Climate adaptation",1
 "P168862","Pollution prevention",1
-"P169403","Climate adaptation",10
+"P169403","Climate adaptation",11
 "P169403","Climate mitigation",2
 "P169403","Biodiversity",1
 "P169403","Circular economy",1
@@ -116,7 +116,7 @@
 "P170236","Climate adaptation",1
 "P172187","Water",2
 "P172187","Biodiversity",1
-"P172548","Pollution prevention",10
+"P172548","Pollution prevention",9
 "P172548","Climate adaptation",4
 "P172548","Climate mitigation",4
 "P172548","Circular economy",1
@@ -127,6 +127,6 @@
 "P173021","Biodiversity",1
 "P173021","Circular economy",1
 "P173021","Pollution prevention",1
-"P175894","Climate mitigation",13
-"P175894","Climate adaptation",7
+"P175894","Climate mitigation",12
+"P175894","Climate adaptation",8
 "P175894","Water",2
