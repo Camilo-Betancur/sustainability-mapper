@@ -1,71 +1,71 @@
-library(tm)
-library(SnowballC)
-library(caTools)
-library(randomForest)
+map_texts <- function(classifier, analysis_mode, tidy_texts) {
+    if (analysis_mode == "EUT") {
+        mode_aux <- "European Taxonomy"
+    } else if (analysis_mode == "SDGs") {
+        mode_aux <- "Sustainable Development Goals"
+    } else {cli_abort("The analysis mode should be either EUT or SDGs.")}
 
-# Create a Document Term Matrix (DFM)
-corpus_dtm <- function(complete_dataset) {
-    cli_h2("The corpus is being created")
-    # The VectorSource is the column of the dataset from which we want to
-    # work with
-    cli_progress_bar("Creating corpus")
-    corpus <- VCorpus(VectorSource(complete_dataset$Text))
+    cli_h1("Mapping texts to the {mode_aux}")
+    cli_h2("Preparing the test data")
+    # Create a Document Term Matrix (DTM)
+    dtm <- corpus_dtm(tidy_texts)
 
-    # Remove stop words
-    cli_progress_update()
-    stopwords <- as.character(
-        read.csv(here('Settings/stop_words.csv'), head = FALSE)$V1)
-    stopwords <- unique(c(stopwords, stopwords()))
+    # Create the raw complete data set
+    x_test <- codify(dtm, tidy_texts)
+    # x_test <- x_test %>% slice(-1)
 
-    # Lowercase all the textdata of out corpus
-    cli_progress_update()
-    corpus <- tm_map(corpus, content_transformer(tolower))
-    # If needed: remove numbers
-    cli_progress_update()
-    corpus <- tm_map(corpus, removeNumbers)
-    # Remove punctuation
-    cli_progress_update()
-    corpus <- tm_map(corpus, removePunctuation)
-    # Remove stop Words
-    cli_progress_update()
-    corpus <- tm_map(corpus, removeWords, stopwords(kind = 'en'))
-    corpus <- tm_map(corpus, removeWords, stopwords)
-    # Conduct the stemming process: to reduce a word to its root.
-    # Reading -> read, playing -> play
-    cli_progress_update()
-    corpus <- tm_map(corpus, stemDocument)
-    # Eliminate multiple white spaces
-    cli_progress_update()
-    corpus <- tm_map(corpus, stripWhitespace)
-    # Create the 'Bag of Words' model
-    cli_progress_update()
-    dtm <- DocumentTermMatrix(corpus)
-    cli_progress_done()
-    return(dtm)
+    # Remove the columns of the test data set that are not in the columns of
+    # the training data set.
+    cols_training <- read.csv(here(
+        "Settings", "Model", glue("cols_training_{analysis_mode}.csv")))[[1]]
+
+    x_test <- x_test[, intersect(colnames(x_test), cols_training)]
+
+    # Identifying the columns of the training data set that are missing from the
+    # test data set.
+    missing_cols <- base::setdiff(cols_training, colnames(x_test))
+
+    # Creating temporal matrix filled with zeroes. Column names are the
+    # missing_cols vector.
+    mat_zero <- setNames(as.data.frame(matrix(0,
+                                              ncol = length(missing_cols),
+                                              nrow = nrow(x_test))),
+                         missing_cols)
+
+    # Cleaning test data set. This makes the training and test data sets have
+    # the same number of columns, with exactly the same column names.
+    x_test <- cbind(mat_zero, x_test)
+    x_test <- x_test[cols_training]
+
+    # Loads the training data.
+    cli_h2("Matching the test data with training data")
+    x_train <- load_training_data(analysis_mode)
+
+    # Creates the working data set (union of training and test data sets).
+    working_dataset <- rbind(x_test, x_train)
+
+    working_dataset$Target <- factor(working_dataset$Target)
+
+    # Identifies the row ids to slice the data sets into training and test rows.
+    test_row <- nrow(x_test)
+    train_row <- nrow(x_train)
+
+    # Slices the working data set to extract the data to be predicted.
+    x_test <- working_dataset[1:test_row, ]
+
+    # Predict the goals that each text maps to.
+    y_pred <- predict(classifier, newdata = x_test[, -ncol(x_test)])
+
+    # Save the results in a character vector
+    classified <- character()
+    for (goal in y_pred) {classified = c(classified, goal)}
+
+    # Subset the data frame and add the classified data as a new column
+    results <- tidy_texts
+
+    results$Target <- classified
+
+    cli_alert_success("Text classification done.")
+
+    return(results)
 }
-
-# Transform the data into a dataframe and codify the SDGs as factors
-dataset_DF <- function(dtm_data, complete_dataset) {
-    dataset <- as.data.frame(as.matrix(dtm_data))
-    dataset$Target <- complete_dataset$Target
-    #str(complete_dataset)
-    return(dataset)
-}
-
-# Codify SDG as factors
-codify <- function(dtm_data, complete_dataset){
-    start <- Sys.time()
-    # Create working data set
-    data_set_to_work <- dataset_DF(dtm_data, complete_dataset)
-
-    # Codify the variable to use as a factor
-    data_set_to_work$Target <- factor(data_set_to_work$Target)
-
-    # Review the levels/factors: SDG targets
-    levels(data_set_to_work$SDG)
-
-    end <- Sys.time()
-    print(end-start)
-    return(data_set_to_work)
-}
-

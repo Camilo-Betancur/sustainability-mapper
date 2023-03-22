@@ -8,6 +8,7 @@
 
 app()}
 
+
 # ===== MANUAL IMPLEMENTATION OF THE APP =======================================
 # Un-comment the following code to start a manual run of the mapper
 
@@ -29,11 +30,23 @@ app()}
 #                export_json = TRUE,
 #                version_name = 'PADs')
 # # OR --------------------------------- or Using previously pre-processed results
-# tidy <- from_saves('PADs')
+# tidy <- from_saves('Test')
 #
 # # ----- Importing the classification model -------------------------------------
 # classifier <- readRDS("Settings/Model/model_SDGs.Rds")
 #
 # # ----- Classifying the texts --------------------------------------------------
-# a <- map_texts(tidy, 'SDGs')
+# a <- map_texts(classifier, 'SDGs', tidy)
 #
+# results <- identify_SDGs(a)
+# results <- results %>% dplyr::filter(SDG != "No map")
+# results <- as_tibble(results)
+#
+# matches_T <- count_matches(results,
+#                            by = 'total_matches',
+#                            sorted = 'Frequency',)
+#
+# export_summary("SDGs",
+#                "Test",
+#                results,
+#                'raw_results')

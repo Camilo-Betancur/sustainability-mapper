@@ -1,9 +1,3 @@
 Output
-Output/EU Taxonomy
-Output/EU Taxonomy/data
-Output/EU Taxonomy/img
-Output/SDGs
-Output/SDGs/data
-Output/SDGs/img
 Saves
 PDF

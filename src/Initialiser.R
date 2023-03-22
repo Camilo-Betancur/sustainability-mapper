@@ -19,11 +19,11 @@ initialise_app <- function(font = 'Roboto Condensed', dpi = 96) {
     library(tidytext)
     library(tidyverse)
     library(tm)
-    source(here('src', 'DataReader.R'))
-    source(here('src', 'Mapper.R'))
-    source(here('src', 'ViewResults.R'))
-    source(here('src', 'AnalysisModule.R'))
-    source(here('src', 'Model.R'))
+
+    for (source_file in list.files(here("src"))) {
+        source(here("src", source_file))
+    }
+
 
     font_add(font,
              here('Settings',
@@ -44,32 +44,4 @@ initialise_app <- function(font = 'Roboto Condensed', dpi = 96) {
     showtext_auto(enable = TRUE)
 
     dir_checker()
-}
-
-
-outputs_folder <- function(analysis_mode, kind) {
-    analysis_mode <- as.character(analysis_mode)[[1]]
-    folders <- jsonlite::fromJSON(here("Settings", "output_folders.json"))
-    return(folders[[analysis_mode]][[kind]])
-}
-
-
-dir_checker <- function(silent = TRUE) {
-    required <- scan(here("Settings", "dirs_required.txt"),
-                     what = 'character',
-                     sep = '\n')
-    required <- here(required)
-
-    for (dir in required) {
-        if (!dir %in% list.dirs(here())) {
-            dir.create(dir)
-            cli_text("Created",
-                     style_italic(col_br_red(" '{dir}' ")),
-                     "successfully")
-        } else {
-            if (silent == FALSE) {
-                print(glue("{dir} exists."))
-            }
-        }
-    }
 }

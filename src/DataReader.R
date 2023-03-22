@@ -2,10 +2,7 @@ extract <- function(folder_name) {
     path <- here('PDF', folder_name)
 
     cli_h1(
-        glue(
-            "The extraction process has started. Please, be patient, this ",
-            " may take a while."
-        )
+        "Extracting texts from the PDF files"
     )
 
     # Initializes the function's timer
@@ -99,10 +96,9 @@ tidify <- function(df,
                    network_mode = FALSE,
                    export_json = FALSE,
                    version_name = NULL) {
-    cli_h1(glue(
-        "The tidying process has started. Please, be patient, this may ",
-        "take a while"
-    ))
+    cli_h1(
+        "Tidying the extracted texts"
+    )
 
     # Initializes the function's timer
     t_0_general <- Sys.time()
@@ -201,53 +197,5 @@ tidify <- function(df,
 
     cli_text("")
 
-    cli_alert_success(glue(
-        "Press {col_green('Y')} or {col_green('y')} and ",
-        "{col_green('ENTER')} to {col_green('SAVE')} the tidy texts. ",
-        "Otherwise, press any key and {col_green('ENTER')}."
-    ))
-
-    export_json <- invisible(readline())
-
-    # Saves the results to a JSON file
-    if ((export_json == 'Y') | (export_json == 'y')) {
-
-        cli_text("")
-
-        cli_text("Please, write the name you want for the saved data.")
-
-        version_name <- invisible(readline())
-
-        write(jsonlite::toJSON(tibblist),
-              file = here(glue("Saves/{version_name}.json")))
-
-        cli_alert_success(glue(
-            "Data successfully exported to the path ",
-            style_underline(style_italic(
-                col_br_red("\'Saves/{version_name}.json\'")
-            ))
-        ))
-
-        cli_alert_info(
-            glue(
-                "Remember that you can open the saved ",
-                "file by running the function ",
-                style_italic("\"from_saves(\'{version_name}\')\"")
-            )
-        )
-
-    }
-
     return(tibblist)
-}
-
-
-from_saves <- function(json_name) {
-    path = here(glue('Saves/{json_name}.json'))
-
-    json_file <- as_tibble(jsonlite::fromJSON(path))
-
-    cli_alert_success('Successfully imported JSON file')
-
-    return(json_file)
 }
