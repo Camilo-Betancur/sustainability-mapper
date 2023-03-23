@@ -1,58 +1,26 @@
 # SAPIENT - Sustainability mApper for Planning and InvestmENT
-SAPIENT is a mapper Tool for helping sustainability decision-making and investment.
 
-Please, cite us as:
+SAPIENT is a Command Line Interface Application designed by the [**Stockholm Environment Institute (SEI)**](https://sei.org/) to help decision-makers and investors assess the level of alignment that a set of projects have with the **Sustainable Development Goals (SDGs)** or the **European Taxonomy for Sustainable Activities (EU Taxonomy)**. It reads the texts of a folder containing PDF files and creates tabular and graphical outputs on the documents' correlation with the SDGs and the EU Taxonomy.
 
-> Lobos Alva, I.; Cárdenas Vélez, M.; & Betancur Jaramillo, J. C.; Hernández Orozco, E.; Maestre Másmela, D. (2022). _SAPIENT - Sustainability mApper for Planning and InvestmENT_. [https://github.com/Camilo-Betancur/SAPIENT](https://github.com/Camilo-Betancur/SAPIENT).
+## Citation
 
-## Overview
+If you use SAPIENT, please cite us as:
 
-Decision-makers and investors often have to appraise large volumes of projects, or report on their contributions to sustainability. We developed SAPIENT as a tool for assessing the level of alignment that a set of projects have with the **Sustainable Development Goals (SDGs)** or the **European Taxonomy for Sustainable Activities (EU Taxonomy)**. 
+> Lobos Alva, I.; Cárdenas Vélez, M.; & Betancur Jaramillo, J. C.; Hernández Orozco, E.; Maestre Másmela, D. (2022). SAPIENT - Sustainability mApper for Planning and InvestmENT. https://github.com/Camilo-Betancur/SAPIENT.
 
-SAPIENT is a Command Line Interface Application designed to be used in R environments such as [RStudio](https://posit.co/products/open-source/rstudio/). It can read the texts of a folder containing PDF files and will create tabular and graphical outputs on the documents correlation with the **SDGs** and the **EU Taxonomy**. This tool breaks each document into phrases, detects if it is correlated to a particular **SDG Target** or **EU Taxonomy Objective**, and produces reports on the individual documents' alignment to the agendas, but also across the whole document set.
+# Installation
+### Installing R language and other requirements
 
-## Installation
-
-### Installing R language and RStudio
-
-First, you must install [R language](https://www.r-project.org/) in your computer and an IDE such as [RStudio](https://posit.co/products/open-source/rstudio/).
-
-### Installing required libraries
-
-You can install the most recent version of the required libraries using the following commands in an R terminal.
+First, you must install  in your computer and an IDE such as 
+To use SAPIENT, you need to install [R language](https://www.r-project.org/) and an Integrated Development Environment (IDE) such as [RStudio](https://posit.co/products/open-source/rstudio/). Then, you can install the required libraries by running the following command in an R terminal:
 
 ```R
-install.packages("caTools")
-install.packages("cli")
-install.packages("DBI")
-install.packages("ggplot2")
-install.packages("ggraph")
-install.packages("glue")
-install.packages("here")
-install.packages("igraph")
-install.packages("jsonlite")
-install.packages("pdftools")
-install.packages("randomForest")
-install.packages("readr")
-install.packages("RSQLite")
-install.packages("showtext")
-install.packages("SnowballC")
-install.packages("sysfonts")
-install.packages("tidygraph")
-install.packages("tidytext")
-install.packages("tidyverse")
-install.packages("tm")
+install.packages(c("caTools", "cli", "DBI", "ggplot2", "ggraph", "glue", "here", "igraph", "jsonlite", "pdftools", "randomForest", "readr", "RSQLite", "showtext", "SnowballC", "sysfonts", "tidygraph", "tidytext", "tidyverse", "tm"))
 ```
 
-### Installing the app
+You can then clone or [download the SAPIENT repository from GitHub](https://github.com/Camilo-Betancur/SAPIENT/).
 
-SAPIENT does not need to be installed to work. You can clone or download the [GitHub repository](https://github.com/Camilo-Betancur/SAPIENT/) and thats it! If you installed the libraries and have their last 
-
-### Requirements
-
-#### OS and R version
-
-This tool should be used with R 4.2.2 or more recent. It has been tested in computers running Windows 10 and 11 with 8 Gb RAM and 2100 Mhz 6-core processor, so we recommend using a machine with those characteristics or better if you want to analyze many documents.
+SAPIENT works best with **R 4.2.2** or newer and a machine with 8 GB RAM and 2100 MHz 6-core processor or better if you want to analyze many documents.
 
 ## Getting Started
 
@@ -76,7 +44,6 @@ To run the app, you must locate the text cursor at the beggining of the file and
 
 ![imagen](https://user-images.githubusercontent.com/111535472/227312170-0e952473-a487-4701-9e5b-928d1e85cdfa.png)
 
- 
 After running the script, you should get something like this:
 
 ![imagen](https://user-images.githubusercontent.com/111535472/227314317-af26a8d5-a233-4252-94ce-25eb1903917a.png)
