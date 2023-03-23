@@ -1,1 +1,0 @@
-cmd /k R -e "load('app.RData')"

@@ -1,4 +1,4 @@
-initialise_app <- function(font = 'Roboto Condensed', dpi = 96) {
+initialize_app <- function(font = 'Roboto Condensed', dpi = 96) {
     library(caTools)
     library(cli)
     library(DBI)
@@ -19,10 +19,17 @@ initialise_app <- function(font = 'Roboto Condensed', dpi = 96) {
     library(tidytext)
     library(tidyverse)
     library(tm)
-
-    for (source_file in list.files(here("src"))) {
-        source(here("src", source_file))
-    }
+    source(here::here("src", "DataAnalysis.R"))
+    source(here::here("src", "DataManagement.R"))
+    source(here::here("src", "DataProcessing.R"))
+    source(here::here("src", "DataReader.R"))
+    source(here::here("src", "Initializer.R"))
+    source(here::here("src", "InterfaceModule.R"))
+    source(here::here("src", "InterfaceStyle.R"))
+    source(here::here("src", "Mapper.R"))
+    source(here::here("src", "Model.R"))
+    source(here::here("src", "PlottingFunctions.R"))
+    source(here::here("src", "Prompts.R"))
 
 
     font_add(font,
