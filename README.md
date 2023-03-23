@@ -1,4 +1,4 @@
-# SAPIENT - Sustainability mApper for Planning and InvestmENT
+![Banner](https://user-images.githubusercontent.com/111535472/227365086-c1d0de30-c040-4ce9-9d84-b5f2c26048f8.png)
 
 SAPIENT is a Command Line Interface Application designed by the [**Stockholm Environment Institute (SEI)**](https://sei.org/) to help decision-makers and investors assess the level of alignment that a set of projects have with the **Sustainable Development Goals (SDGs)** or the **European Taxonomy for Sustainable Activities (EU Taxonomy)**. It reads the texts of a folder containing PDF files and creates tabular and graphical outputs on the documents' correlation with the SDGs and the EU Taxonomy.
 
@@ -15,7 +15,13 @@ First, you must install  in your computer and an IDE such as
 To use SAPIENT, you need to install [R language](https://www.r-project.org/) and an Integrated Development Environment (IDE) such as [RStudio](https://posit.co/products/open-source/rstudio/). Then, you can install the required libraries by running the following command in an R terminal:
 
 ```R
-install.packages(c("caTools", "cli", "DBI", "ggplot2", "ggraph", "glue", "here", "igraph", "jsonlite", "pdftools", "randomForest", "readr", "RSQLite", "showtext", "SnowballC", "sysfonts", "tidygraph", "tidytext", "tidyverse", "tm"))
+install.packages(c("caTools", "cli", "DBI", "ggplot2", 
+                   "ggraph", "glue", "here", "igraph", 
+                   "jsonlite", "pdftools", "randomForest", 
+                   "readr", "RSQLite", "showtext", "SnowballC", 
+                   "sysfonts", "tidygraph", "tidytext", 
+                   "tidyverse", "tm"
+                   ))
 ```
 
 You can then clone or [download the SAPIENT repository from GitHub](https://github.com/Camilo-Betancur/SAPIENT/).

@@ -10,7 +10,6 @@ app()}
 
 
 
-
 # ===== MANUAL IMPLEMENTATION OF THE APP =======================================
 # Un-comment the following code to start a manual run of the mapper
 
