@@ -3,6 +3,8 @@ SAPIENT is a mapper Tool for helping sustainability decision-making and investme
 
 Please, cite us as:
 
+> Lobos Alva, I.; Cárdenas Vélez, M.; & Betancur Jaramillo, J. C.; Hernández Orozco, E.; Maestre Másmela, D. (2022). _SAPIENT - Sustainability mApper for Planning and InvestmENT_. [https://github.com/Camilo-Betancur/SAPIENT](https://github.com/Camilo-Betancur/SAPIENT).
+
 ## Overview
 
 Decision-makers and investors often have to appraise large volumes of projects, or report on their contributions to sustainability. We developed SAPIENT as a tool for assessing the level of alignment that a set of projects have with the **Sustainable Development Goals (SDGs)** or the **European Taxonomy for Sustainable Activities (EU Taxonomy)**. 
@@ -110,14 +112,29 @@ After choosing an analysis mode, the application will ask you to tell it where w
 
 For this example, we will choose to **Start analysis from scratch**.
 
-![imagen](https://user-images.githubusercontent.com/111535472/227324361-8f858f0c-8b9a-4d52-9051-4caf659da312.png)
+![imagen](https://user-images.githubusercontent.com/111535472/227325846-a6d0b7bc-c036-4819-aa17-c573843eee79.png)
 
-The app will ask us for the name of the folder containing the projects, which is the one we created before inside **_SAPIENT/PDF/_**.
+The app will ask us for the name of the folder containing the projects, which is the one we created before inside **_SAPIENT/PDF/_**. After that, the app will extract the texts from the PDFs and will ask you if you want to save the extracted texts into a .json file. If you choose to save it, the resulting file will be saved into **_SAPIENT/Saves/_** and you will be able to use it in future analysis just by choosing the option **2) Read saved data** and writing the project name.
 
+![imagen](https://user-images.githubusercontent.com/111535472/227326179-f6247501-6401-4f81-9245-d9733689c57e.png)
 
+### Saving the tabular results
 
+After that, the mapping will start, and soon you will be asked to save or discard the tabular results of the analysis. If you choose to save it, you will find them saved into **_SAPIENT/Output/[Project name]/[Analysis mode]/data_**. For our example, we will find the tabular data at: **_SAPIENT/Output/Test/SDGs/data_**.
 
+![imagen](https://user-images.githubusercontent.com/111535472/227328094-84983d1e-28a5-46f0-9142-8d0b78292a0c.png) 
+
+![imagen](https://user-images.githubusercontent.com/111535472/227328481-21bd60b3-8dc8-4cb2-8165-b8f96d407e69.png)
+
+### Viewing and saving the graphical outputs
+
+After saving or discarding the tabular data, SAPIENT will prompt you to view the results plots. After pressing ENTER, the first plot will be displayed into the plots tab at the right side of RStudio. Also, SAPIENT will ask you to save or discard the plot which, if saved, can be found in **_SAPIENT/Output/[Project name]/[Analysis mode]/img_**. For our example, the path would be: **_SAPIENT/Output/Test/SDGs/img_**.
+
+![imagen](https://user-images.githubusercontent.com/111535472/227330831-8973c0f5-288c-494a-a03c-e2a06a1376f3.png)
 
 ## Contact
 
-[Summary of the key points covered in the manual, along with encouragement to continue using the app]
+For further information, please contact:
+- Ivonne Lobos Alva ([ivonne.lobos@sei.org](mailto:ivonne.lobos@sei.org)),
+- Mario Cárdenas ([mario.cardenas@sei.org](mailto:mario.cardenas@sei.org)),
+- or Juan Camilo Betancur ([juan.betancur@sei.org](mailto:juan.betancur@sei.org)).
