@@ -54,7 +54,7 @@ run_mapper <- function() {
     cli_text(glue(
         "Welcome to ", emphasize_light("SAPIENT"), ", a tool developed by the ",
         emphasize_light('Stockholm Environment Institute'),
-        " for mapping the World Bank's portfolio to the ",
+        " for mapping projects and policy docyments to the ",
         emphasize_light('Sustainable Development Goals (SDGs)'), " and the ",
         emphasize_light('European Taxonomy for Sustainable Activities'), ". ",
         "This application will allow you to identify which targets and goals ",
