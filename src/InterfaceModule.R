@@ -54,7 +54,7 @@ run_mapper <- function() {
     cli_text(glue(
         "Welcome to ", emphasize_light("SAPIENT"), ", a tool developed by the ",
         emphasize_light('Stockholm Environment Institute'),
-        " for mapping projects and policy docyments to the ",
+        " for mapping projects and policy documents to the ",
         emphasize_light('Sustainable Development Goals (SDGs)'), " and the ",
         emphasize_light('European Taxonomy for Sustainable Activities'), ". ",
         "This application will allow you to identify which targets and goals ",
@@ -494,8 +494,8 @@ credits <- function() {
     cli_text("")
     cli_text(glue(
         glue(
-            "Lobos Alva, I.; Cárdenas Vélez, M.; & ",
-            "Betancur Jaramillo, J. C.; Hernández Orozco, E.; ",
+            "Lobos Alva, I.; Cárdenas Vélez, M.; ",
+            "Betancur Jaramillo, J. C.; Hernández Orozco, E.; & ",
             "Maestre Másmela, D. (2022). ",
             style_italic("SAPIENT - "),
             style_italic("Sustainability mApper for Planning and "),
@@ -512,8 +512,8 @@ github_link <- function() {
     # El link debe ser reemplazado por un github de la línea ODS.
     return(
         custom_hyperlink(style_hyperlink(
-            "https://github.com/Camilo-Betancur/SAPIENT.",
-            "https://github.com/Camilo-Betancur/SAPIENT"
+            "https://github.com/SEI-LA-SDGs/SAPIENT.",
+            "https://github.com/SEI-LA-SDGs/SAPIENT"
         ))
     )
 }
