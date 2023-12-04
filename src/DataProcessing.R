@@ -20,7 +20,7 @@ corpus_dtm <- function(complete_dataset) {
         read.csv(here('Settings/stop_words.csv'), head = FALSE)$V1)
     stopwords <- unique(c(stopwords, stopwords()))
 
-    # Lowercase all the textdata of out corpus
+    # Lowercase all the text data of out corpus
     cli_text("Transforming to lowercase.")
     corpus <- tm_map(corpus, content_transformer(tolower))
 
